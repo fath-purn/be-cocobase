@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+
+  petani    Petani[]
+  produksi  Produksi[]
+  produk    Produk[]
+  cocoblog  Cocoblog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Petani {
+  id     Int    @id @default(autoincrement())
+  nama   String
+  alamat String
+  no_hp  String
+  id_admin Int
+
+  admin    Admin   @relation(fields: [id_admin], references: [id])
+  produksi  Produksi[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Produksi {
+  id        Int    @id @default(autoincrement())
+  id_petani Int
+  id_admin  Int
+  produk    String
+  jumlah    Int
+  status    status @default(DIAYAK)
+
+  petani    Petani   @relation(fields: [id_petani], references: [id])
+  admin     Admin    @relation(fields: [id_admin], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Produk {
+  id        Int      @id @default(autoincrement())
+  id_admin  Int
+  nama      String
+  link      String
+  deskripsi String
+  jumlah    Int
+  gambar    Gambar[]
+
+  admin     Admin    @relation(fields: [id_admin], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cocoblog {
+  id        Int    @id @default(autoincrement())
+  id_admin  Int
+  judul String
+  isi String
+
+  admin    Admin   @relation(fields: [id_admin], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  gambar Gambar[]
+}
+
+model Gambar {
+  id         Int     @id @default(autoincrement())
+  idImagekit String  @unique
+  nama       String
+  url        String
+  ProdukId   Int?
+  produk     Produk? @relation(fields: [ProdukId], references: [id])
+  CocoblogId Int?
+  cocoblog   Cocoblog? @relation(fields: [CocoblogId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum status {
+  DIAYAK
+  DIOVEN
+  DISORTIR
+  DIKEMAS
+  SELESAI
+}
