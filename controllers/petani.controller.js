@@ -98,6 +98,9 @@ const getPetaniById = async (req, res, next) => {
     const { id } = req.params;
     const petani = await prisma.petani.findUnique({
       where: { id: toNumber(id) },
+      include: {
+        produksi: true,
+      },
     });
 
     if (!petani) {
