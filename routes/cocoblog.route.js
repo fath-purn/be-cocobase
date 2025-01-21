@@ -10,8 +10,8 @@ const {
     getCocoblogById,
 } = require("../controllers/cocoblog.controller");
 
-router.get("/", verifyToken, getAllCocoblog);
-router.get("/:id", verifyToken, getCocoblogById);
+router.get("/", getAllCocoblog);
+router.get("/:id", getCocoblogById);
 router.put("/:id", upload.single("image"), verifyToken, updateCocoblog);
 router.delete("/:id", verifyToken, deleteCocoblog);
 router.post("/", upload.single("image"), verifyToken, createCocoblog);
