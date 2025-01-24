@@ -57,7 +57,7 @@ const pembeliSchema = joi.object({
   no_telp: joi.string().required(),
 })
 
-const transaksiSchme = joi.object({
+const transaksiScheme = joi.object({
   id_pembeli: joi.number().required(),
   id_produk: joi.number().required(),
   jumlah: joi.number().required(),
@@ -72,5 +72,5 @@ module.exports = {
   produksiSchemaUpdateStatus,
   cocoblogSchema,
   pembeliSchema,
-  transaksiSchme,
+  transaksiScheme,
 };

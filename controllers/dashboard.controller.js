@@ -29,7 +29,7 @@ const getProdukByMonth = async (monthOffset = 0) => {
   const startDate = new Date(new Date().getFullYear(), new Date().getMonth() + monthOffset, 1);
   const endDate = new Date(new Date().getFullYear(), new Date().getMonth() + monthOffset + 1, 0);
 
-  const produk = await prisma.produk.findMany({
+  const produk = await prisma.transaksi.findMany({
     where: {
       createdAt: {
         gte: startDate,
@@ -55,7 +55,7 @@ const dashboardAtas = async (req, res, next) => {
 
     // Mengambil data produk
     const [produkTotal, produkBulanIni, produkBulanSebelumnya] = await Promise.all([
-      prisma.produk.aggregate({ _sum: { jumlah: true } }),
+      prisma.transaksi.aggregate({ _sum: { jumlah: true } }),
       getProdukByMonth(),
       getProdukByMonth(-1),
     ]);
@@ -152,3 +152,4 @@ const dashboardAtas = async (req, res, next) => {
 module.exports = {
   dashboardAtas,
 };
+

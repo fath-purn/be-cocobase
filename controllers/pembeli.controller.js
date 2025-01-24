@@ -66,6 +66,19 @@ const getAllPembeli = async (req, res, next) => {
             mode: "insensitive",
           },
         } : {},
+        include: {
+          transaksi: {
+            select: {
+              jumlah: true,
+              harga: true,
+              produk: {
+                select: {
+                  nama: true,
+                }
+              }
+            }
+          },
+        },
         skip,
         take,
         orderBy: {
@@ -83,12 +96,21 @@ const getAllPembeli = async (req, res, next) => {
       }),
     ]);
 
+    const formattedPembeli = getPembeli.map((data) => ({
+      ...data,
+      transaksi: data.transaksi.map((trans) => ({
+        ...trans,
+        total: trans.jumlah * trans.harga,
+        produk: trans.produk.nama,
+        })),
+    }));
+
     const pagination = getPagination(req, res, _count.id, page, limit, search);
     return res.status(200).json({
       success: true,
       message: "OK",
       err: null,
-      data: { pagination, pembeli: getPembeli },
+      data: { pagination, pembeli: formattedPembeli },
     });
   } catch (err) {
     next(err);
