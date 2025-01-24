@@ -15,10 +15,12 @@ const createProduk = async (req, res, next) => {
       return handleErrorResponse(res, error);
     }
 
+    const {linkGambar, ...dataProduk} = value;
+
     const produk = await prisma.produk.create({
       data: {
         id_admin,
-        ...value,
+        ...dataProduk,
       },
     });
 
@@ -47,6 +49,9 @@ const getAllProduk = async (req, res, next) => {
         include: { gambar: { select: { url: true } } },
         skip,
         take,
+        orderBy: {
+          createdAt: 'desc',
+        },
       }),
       prisma.produk.aggregate({
         _count: { id: true },
@@ -125,23 +130,44 @@ const updateProduk = async (req, res, next) => {
       });
     }
 
-    await prisma.gambar.deleteMany({ where: { ProdukId: parseInt(id) } });
+    const {linkGambar, ...dataProduk} = value;
 
-    const produk = await prisma.produk.update({
-      where: { id: parseInt(id) },
-      data: {
-        id_admin,
-        ...value,
-      },
-    });
-
-    const gambar = await uploadFiles(req.file, produk.id, 'Produk', produk.judul);
-    
-    res.status(200).json({
-      success: true,
-      message: "Update produk berhasil",
-      data: { produk, gambar },
-    });
+    if (req.file) {
+      await prisma.gambar.deleteMany({ where: { ProdukId: parseInt(id) } });
+      const gambar = await uploadFiles(req.file, check.id, 'Produk', check.judul);
+      const produk = await prisma.produk.update({
+        where: { id: parseInt(id) },
+        data: {
+          id_admin,
+          ...dataProduk,
+        },
+      });
+      res.status(200).json({
+        success: true,
+        message: "Update produk berhasil",
+        data: { produk, gambar },
+      });
+    } else {
+      if (!linkGambar) {
+        return res.status(404).json({
+          success: false,
+          message: "Link gambar tidak ditemukan",
+          data: null,
+        });
+      }
+      const produk = await prisma.produk.update({
+        where: { id: parseInt(id) },
+        data: {
+          id_admin,
+          ...dataProduk,
+        },
+      });
+      res.status(200).json({
+        success: true,
+        message: "Update produk berhasil",
+        data: produk,
+      });
+    }
   } catch (err) {
     next(err);
     handleErrorResponse(res, err);

@@ -4,6 +4,10 @@ const { cocoblogSchema } = require("../validations/validation");
 const { handleErrorResponse } = require("../middlewares/handleErrorResponse");
 const uploadFiles = require("../libs/uploadImage");
 
+const toNumber = (value) => {
+  return Number(value);
+};
+
 const createCocoblog = async (req, res, next) => {
   try {
     const { value, error } = cocoblogSchema.validate(req.body);
@@ -13,11 +17,12 @@ const createCocoblog = async (req, res, next) => {
       return handleErrorResponse(res, error);
     }
 
+    const {linkGambar, ...dataProduk} = value;
+
     const cocoblog = await prisma.cocoblog.create({
       data: {
         id_admin,
-        judul: value.judul,
-        isi: value.isi,
+        ...dataProduk,
       },
     });
 
@@ -38,6 +43,9 @@ const createCocoblog = async (req, res, next) => {
 const getAllCocoblog = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
+    const skip = (toNumber(page) - 1) * toNumber(limit);
+    const take = toNumber(limit);
+
     const whereClause = search
       ? {
           judul: {
@@ -53,8 +61,11 @@ const getAllCocoblog = async (req, res, next) => {
         include: {
           gambar: { select: { url: true } },
         },
-        skip: (Number(page) - 1) * Number(limit),
-        take: Number(limit),
+        skip,
+        take,
+        orderBy: {
+          createdAt: 'desc',
+        },
       }),
       prisma.cocoblog.aggregate({ _count: { id: true }, where: whereClause }),
     ]);
@@ -136,21 +147,43 @@ const updateCocoblog = async (req, res, next) => {
       });
     }
 
-    await prisma.gambar.deleteMany({ where: { CocoblogId: Number(id) } });
+    const {linkGambar, ...dataCocoblog} = value;
+
+    if (req.file) {
+      await prisma.gambar.deleteMany({ where: { CocoblogId: Number(id) } });
+      const gambar = await uploadFiles(req.file, check.id, 'Cocoblog', check.judul);
+      const cocoblog = await prisma.cocoblog.update({
+        where: { id: Number(id) },
+        data: { id_admin, ...dataCocoblog },
+      });
+      res.status(200).json({
+        success: true,
+        message: "Update cocoblog berhasil",
+        err: null,
+        data: { cocoblog, gambar },
+      });
+  } else {
+    if (!linkGambar) {
+      return res.status(404).json({
+        success: false,
+        message: "Link gambar tidak ditemukan",
+        data: null,
+      });
+    }
 
     const cocoblog = await prisma.cocoblog.update({
-      where: { id: Number(id) },
-      data: { id_admin, judul: value.judul, isi: value.isi },
+      where: { id: parseInt(id) },
+      data: {
+        id_admin,
+        ...dataCocoblog,
+      },
     });
-
-    const gambar = await uploadFiles(req.file, cocoblog.id, 'Cocoblog', cocoblog.judul);
-
     res.status(200).json({
       success: true,
-      message: "Update cocoblog berhasil",
-      err: null,
-      data: { cocoblog, gambar },
+      message: "Update produk berhasil",
+      data: cocoblog,
     });
+  }
   } catch (err) {
     next(err);
     return handleErrorResponse(res, err);

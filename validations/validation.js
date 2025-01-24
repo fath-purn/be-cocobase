@@ -43,11 +43,13 @@ const produkSchema = joi.object({
   link: joi.string().required(),
   deskripsi: joi.string().required(),
   jumlah: joi.number().required(),
+  linkGambar: joi.string(),
 });
 
 const cocoblogSchema = joi.object({
   judul: joi.string().required(),
   isi: joi.string().required(),
+  linkGambar: joi.string(),
 })
 
 module.exports = {

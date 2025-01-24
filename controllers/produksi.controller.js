@@ -66,6 +66,9 @@ const getAllProduksi = async (req, res, next) => {
         },
         skip: (Number(page) - 1) * Number(limit),
         take: Number(limit),
+        orderBy: {
+          createdAt: 'desc',
+        },
       }),
       prisma.produksi.aggregate({
         _count: { id: true },
