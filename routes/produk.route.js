@@ -10,8 +10,8 @@ const {
   deleteProduk,
 } = require("../controllers/produk.controller");
 
-router.get("/", verifyToken, getAllProduk);
-router.get("/:id", verifyToken, getProdukById);
+router.get("/", getAllProduk);
+router.get("/:id", getProdukById);
 router.put("/:id", upload.single("image"), verifyToken, updateProduk);
 router.delete("/:id", verifyToken, deleteProduk);
 router.post("/", upload.single("image"), verifyToken, createProduk);
