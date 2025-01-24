@@ -42,7 +42,6 @@ const produkSchema = joi.object({
   nama: joi.string().required(),
   link: joi.string().required(),
   deskripsi: joi.string().required(),
-  jumlah: joi.number().required(),
   linkGambar: joi.string(),
 });
 
@@ -52,6 +51,19 @@ const cocoblogSchema = joi.object({
   linkGambar: joi.string(),
 })
 
+const pembeliSchema = joi.object({
+  nama: joi.string().required(),
+  alamat: joi.string().required(),
+  no_telp: joi.string().required(),
+})
+
+const transaksiSchme = joi.object({
+  id_pembeli: joi.number().required(),
+  id_produk: joi.number().required(),
+  jumlah: joi.number().required(),
+  harga: joi.number().required(),
+});
+
 module.exports = {
   petaniSchema,
   produksiSchema,
@@ -59,4 +71,6 @@ module.exports = {
   produksiSchemaUpdate,
   produksiSchemaUpdateStatus,
   cocoblogSchema,
+  pembeliSchema,
+  transaksiSchme,
 };

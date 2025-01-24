@@ -19,19 +19,21 @@ model Admin {
   produksi  Produksi[]
   produk    Produk[]
   cocoblog  Cocoblog[]
+  pembeli   Pembeli[]
+  transaksi Transaksi[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Petani {
-  id     Int    @id @default(autoincrement())
-  nama   String
-  alamat String
-  no_hp  String
+  id       Int    @id @default(autoincrement())
+  nama     String
+  alamat   String
+  no_hp    String
   id_admin Int
 
-  admin    Admin   @relation(fields: [id_admin], references: [id])
+  admin     Admin      @relation(fields: [id_admin], references: [id])
   produksi  Produksi[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -52,13 +54,14 @@ model Produksi {
 }
 
 model Produk {
-  id        Int      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   id_admin  Int
   nama      String
   link      String
   deskripsi String
-  jumlah    Int
+  jumlah    Int         @default(0)
   gambar    Gambar[]
+  transaksi Transaksi[]
 
   admin     Admin    @relation(fields: [id_admin], references: [id])
   createdAt DateTime @default(now())
@@ -66,24 +69,54 @@ model Produk {
 }
 
 model Cocoblog {
-  id        Int    @id @default(autoincrement())
-  id_admin  Int
-  judul String
-  isi String
+  id       Int    @id @default(autoincrement())
+  id_admin Int
+  judul    String
+  isi      String
 
-  admin    Admin   @relation(fields: [id_admin], references: [id])
+  admin     Admin    @relation(fields: [id_admin], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  gambar Gambar[]
+  gambar    Gambar[]
+}
+
+model Pembeli {
+  id       Int    @id @default(autoincrement())
+  id_admin Int
+  nama     String
+  alamat   String
+  no_telp  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  admin     Admin       @relation(fields: [id_admin], references: [id])
+  transaksi Transaksi[]
+}
+
+model Transaksi {
+  id         Int @id @default(autoincrement())
+  id_admin   Int
+  id_pembeli Int
+  id_produk  Int
+  jumlah     Int
+  harga      Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  admin   Admin   @relation(fields: [id_admin], references: [id])
+  pembeli Pembeli @relation(fields: [id_pembeli], references: [id])
+  produk  Produk  @relation(fields: [id_produk], references: [id])
 }
 
 model Gambar {
-  id         Int     @id @default(autoincrement())
-  idImagekit String  @unique
+  id         Int       @id @default(autoincrement())
+  idImagekit String    @unique
   nama       String
   url        String
   ProdukId   Int?
-  produk     Produk? @relation(fields: [ProdukId], references: [id])
+  produk     Produk?   @relation(fields: [ProdukId], references: [id])
   CocoblogId Int?
   cocoblog   Cocoblog? @relation(fields: [CocoblogId], references: [id])
 
