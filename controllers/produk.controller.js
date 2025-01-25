@@ -15,7 +15,7 @@ const createProduk = async (req, res, next) => {
       return handleErrorResponse(res, error);
     }
 
-    const {linkGambar, ...dataProduk} = value;
+    const { linkGambar, ...dataProduk } = value;
 
     const produk = await prisma.produk.create({
       data: {
@@ -24,8 +24,13 @@ const createProduk = async (req, res, next) => {
       },
     });
 
-    const gambar = await uploadFiles(req.file, produk.id, 'Produk', produk.judul);
-    
+    const gambar = await uploadFiles(
+      req.file,
+      produk.id,
+      "Produk",
+      produk.judul
+    );
+
     res.status(201).json({
       success: true,
       message: "Produk berhasil ditambahkan",
@@ -45,27 +50,35 @@ const getAllProduk = async (req, res, next) => {
 
     const [getProduk, { _count }] = await Promise.all([
       prisma.produk.findMany({
-        where: search ? { nama: { contains: search, mode: "insensitive" } } : {},
-        include: { gambar: { select: { url: true } } },
+        where: search
+          ? { nama: { contains: search, mode: "insensitive" } }
+          : {},
+        include: { gambar: { select: { url: true } }, transaksi: {select: {jumlah: true}} },
         skip,
         take,
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       }),
       prisma.produk.aggregate({
         _count: { id: true },
-        where: search ? { nama: { contains: search, mode: "insensitive" } } : {},
+        where: search
+          ? { nama: { contains: search, mode: "insensitive" } }
+          : {},
       }),
     ]);
 
-    const formattedProduk = getProduk.map((produk) => ({
-      ...produk,
-      gambar: produk.gambar[0]?.url || null,
-    }));
+    const formattedProduk = getProduk.map((produk) => {
+      const { transaksi, ...rest } = produk;
+      return {
+        ...rest,
+        jumlah: transaksi.reduce((acc, transaksi) => acc + transaksi.jumlah, 0 ),
+        gambar: produk.gambar[0]?.url || null,
+      };
+    });
 
     const pagination = getPagination(req, res, _count.id, page, limit);
-    
+
     res.status(200).json({
       success: true,
       message: "OK",
@@ -130,11 +143,16 @@ const updateProduk = async (req, res, next) => {
       });
     }
 
-    const {linkGambar, ...dataProduk} = value;
+    const { linkGambar, ...dataProduk } = value;
 
     if (req.file) {
       await prisma.gambar.deleteMany({ where: { ProdukId: parseInt(id) } });
-      const gambar = await uploadFiles(req.file, check.id, 'Produk', check.judul);
+      const gambar = await uploadFiles(
+        req.file,
+        check.id,
+        "Produk",
+        check.judul
+      );
       const produk = await prisma.produk.update({
         where: { id: parseInt(id) },
         data: {
