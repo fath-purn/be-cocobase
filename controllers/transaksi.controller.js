@@ -122,6 +122,16 @@ const getAllTransaksi = async (req, res, next) => {
     const formattedTransaksi = getTransaksi.map((transaksi) => ({
       ...transaksi,
       total: transaksi.harga * transaksi.jumlah,
+      createdAt: new Date(transaksi.createdAt).toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        dateStyle: "short",
+        timeStyle: "short",
+      }),
+      updatedAt: new Date(transaksi.updatedAt).toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        dateStyle: "short",
+        timeStyle: "short",
+      }),
     }));
 
     const pagination = getPagination(req, res, _count.id, page, limit, search);

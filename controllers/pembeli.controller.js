@@ -95,8 +95,16 @@ const getAllPembeli = async (req, res, next) => {
 
     const formattedPembeli = getPembeli.map((data) => ({
       ...data,
-      createdAt: formatTanggal(data.createdAt),
-      updatedAt: formatTanggal(data.updatedAt),
+      createdAt: new Date(data.createdAt).toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        dateStyle: "short",
+        timeStyle: "short",
+      }),
+      updatedAt: new Date(data.updatedAt).toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        dateStyle: "short",
+        timeStyle: "short",
+      }),
       transaksi: data.transaksi.map((trans) => ({
         ...trans,
         createdAt: formatTanggal(trans.createdAt),
