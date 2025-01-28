@@ -107,8 +107,16 @@ const getAllPembeli = async (req, res, next) => {
       }),
       transaksi: data.transaksi.map((trans) => ({
         ...trans,
-        createdAt: formatTanggal(trans.createdAt),
-        updatedAt: formatTanggal(trans.updatedAt),
+        createdAt: new Date(trans.createdAt).toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          dateStyle: "short",
+          timeStyle: "short",
+        }),
+        updatedAt: new Date(trans.updatedAt).toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          dateStyle: "short",
+          timeStyle: "short",
+        }),
         total: trans.jumlah * trans.harga,
         produk: trans.produk.nama,
       })),
