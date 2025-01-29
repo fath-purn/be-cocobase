@@ -3,6 +3,7 @@ const { getPagination } = require("../helpers/pagination");
 const { cocoblogSchema } = require("../validations/validation");
 const { handleErrorResponse } = require("../middlewares/handleErrorResponse");
 const uploadFiles = require("../libs/uploadImage");
+const { convertMarkdownToHtml } = require("../helpers/markdown");
 
 const toNumber = (value) => {
   return Number(value);
@@ -19,10 +20,13 @@ const createCocoblog = async (req, res, next) => {
 
     const {linkGambar, ...dataProduk} = value;
 
+    const isi = convertMarkdownToHtml(dataProduk.isi);
+
     const cocoblog = await prisma.cocoblog.create({
       data: {
         id_admin,
         ...dataProduk,
+        isi: isi,
       },
     });
 
@@ -148,13 +152,14 @@ const updateCocoblog = async (req, res, next) => {
     }
 
     const {linkGambar, ...dataCocoblog} = value;
+    const isi = convertMarkdownToHtml(dataCocoblog.isi);
 
     if (req.file) {
       await prisma.gambar.deleteMany({ where: { CocoblogId: Number(id) } });
       const gambar = await uploadFiles(req.file, check.id, 'Cocoblog', check.judul);
       const cocoblog = await prisma.cocoblog.update({
         where: { id: Number(id) },
-        data: { id_admin, ...dataCocoblog },
+        data: { id_admin, ...dataCocoblog, isi: isi },
       });
       res.status(200).json({
         success: true,
@@ -221,10 +226,39 @@ const deleteCocoblog = async (req, res, next) => {
   }
 };
 
+const uploadGambar = async (req, res, next) => {
+  try {
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "File gambar tidak ditemukan",
+        err: null,
+        data: null
+      });
+    }
+
+    const gambar = await uploadFiles(req.file,);
+
+    return res.status(200).json({
+      success: true,
+      message: "Gambar berhasil diupload",
+      err: null,
+      data: { gambar },
+    });
+
+  } catch (err) {
+    next(err);
+    return handleErrorResponse(res, err);
+  }
+};
+
+
 module.exports = {
   createCocoblog,
   getAllCocoblog,
   updateCocoblog,
   deleteCocoblog,
   getCocoblogById,
+  uploadGambar,
 };

@@ -72,7 +72,7 @@ model Cocoblog {
   id       Int    @id @default(autoincrement())
   id_admin Int
   judul    String
-  isi      String
+  isi      String @db.Text
 
   admin     Admin    @relation(fields: [id_admin], references: [id])
   createdAt DateTime @default(now())

@@ -2,7 +2,7 @@ const imagekit = require("./imagekit");
 const path = require("path");
 const prisma = require("./prisma");
 
-const uploadFiles = async (file, entityId, entityName, title) => {
+const uploadFiles = async (file, entityId, entityName,) => {
   if (!file) throw new Error("File is required");
 
   try {
