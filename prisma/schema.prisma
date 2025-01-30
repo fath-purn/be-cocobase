@@ -21,6 +21,7 @@ model Admin {
   cocoblog  Cocoblog[]
   pembeli   Pembeli[]
   transaksi Transaksi[]
+  Scrap Scrap[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -31,6 +32,8 @@ model Petani {
   nama     String
   alamat   String
   no_hp    String
+  RT       String
+  RW       String
   id_admin Int
 
   admin     Admin      @relation(fields: [id_admin], references: [id])
@@ -122,6 +125,22 @@ model Gambar {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Scrap {
+  id            Int      @id @default(autoincrement()) 
+  id_admin      Int
+  minggu_ke     Int
+  bulan         Int
+  tahun         Int
+  harga_rata    Int
+  jumlah_total  Int
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  admin         Admin    @relation(fields: [id_admin], references: [id])
+  @@unique([minggu_ke, bulan, tahun])
 }
 
 enum status {

@@ -4,6 +4,8 @@ const petaniSchema = joi.object({
   nama: joi.string().required(),
   alamat: joi.string().required(),
   no_hp: joi.string().required(),
+  RT: joi.string().required(),
+  RW: joi.string().required(),
 });
 
 const Status = {
@@ -64,6 +66,14 @@ const transaksiScheme = joi.object({
   harga: joi.number().required(),
 });
 
+const scrapSchema = joi.object({
+  minggu_ke: joi.number().required(),
+  bulan: joi.number().required(),
+  tahun: joi.number().required(),
+  harga_rata: joi.number().required(), // harga rata-rata produk yang dijual
+  jumlah_total: joi.number().required(), // jumlah total produk yang dijual
+})
+
 module.exports = {
   petaniSchema,
   produksiSchema,
@@ -73,4 +83,5 @@ module.exports = {
   cocoblogSchema,
   pembeliSchema,
   transaksiScheme,
+  scrapSchema,
 };

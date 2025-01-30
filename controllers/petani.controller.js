@@ -2,17 +2,7 @@ const prisma = require("../libs/prisma");
 const { getPagination } = require("../helpers/pagination");
 const { petaniSchema } = require("../validations/validation");
 const { handleErrorResponse } = require("../middlewares/handleErrorResponse");
-
-function formatNomorHP(nomerHP) {
-  const nomerHPString = nomerHP.toString();
-  if (nomerHPString.startsWith("0")) {
-    return "62" + nomerHPString.slice(1);
-  } else if (!nomerHPString.startsWith("62")) {
-    return "62" + nomerHPString;
-  } else {
-    return nomerHPString;
-  }
-}
+const { formatNomorHP } = require("../helpers/helper");
 
 const handleValidation = (data) => {
   const { value, error } = petaniSchema.validate(data);

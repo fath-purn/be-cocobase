@@ -8,5 +8,6 @@ router.use('/dashboard', require('./dashboard.route'));
 router.use('/cocoblog', require('./cocoblog.route'));
 router.use('/pembeli', require('./pembeli.route'));
 router.use('/transaksi', require('./transaksi.route'));
+router.use('/scrap', require('./scrap.route'));
 
 module.exports = router;
