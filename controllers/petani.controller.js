@@ -59,7 +59,7 @@ const getAllPetani = async (req, res, next) => {
         skip,
         take,
         orderBy: {
-          createdAt: 'desc',
+          nama: 'asc',
         },
       }),
       prisma.petani.aggregate({
