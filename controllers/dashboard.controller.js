@@ -68,10 +68,7 @@ const dashboardAtas = async (req, res, next) => {
       getCountByMonth(prisma.cocoblog),
       getCountByMonth(prisma.cocoblog, -1),
     ]);
-
-    const jumlahCocoblogBertambah = cocoblogBulanIni - cocoblogBulanSebelumnya;
-
-    // Mengambil data produksi berdasarkan status
+    
     const statusCounts = await prisma.produksi.groupBy({
       by: ['status'],
       _count: { status: true },
@@ -90,20 +87,22 @@ const dashboardAtas = async (req, res, next) => {
     const atas = [
       {
         nama: "petani",
-        nilai: petaniTotal._count.id,
-        value: jumlahPetaniBertambah,
+        nilai: jumlahPetaniBertambah,
+        value: petaniTotal._count.id,
       },
       {
         nama: "produk",
-        nilai: produkTotal._sum.jumlah,
-        value: peningkatanJumlahProduk,
+        nilai: peningkatanJumlahProduk,
+        value: produkTotal._sum.jumlah || 0,
       },
+
       {
         nama: "cocoblog",
-        nilai: cocoblogTotal._count.id,
-        value: jumlahCocoblogBertambah,
+        nilai: cocoblogBulanIni,
+        value: cocoblogTotal._count.id,
       },
     ];
+
 
     const kanan = [
       {
